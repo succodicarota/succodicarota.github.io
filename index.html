@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown con Immagine</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            color: #333;
+        }
+        #countdown {
+            font-size: 2em;
+            color: #ff4444;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        img {
+            width: 200px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Tra 3 ore avrai il tuo premio!</h1>
+        <img src="gatto.webp" alt="Gatto con cuore">
+        <div id="countdown">03:00:00</div>
+    </div>
+
+    <script>
+        // Imposta il tempo di fine (3 ore in millisecondi)
+        var countDownDate = new Date().getTime() + 3 * 60 * 60 * 1000;
+
+        // Aggiorna il conto alla rovescia ogni secondo
+        var countdownFunction = setInterval(function() {
+            var now = new Date().getTime();
+            var distance = countDownDate - now;
+
+            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById("countdown").innerHTML = hours + ":" + minutes + ":" + seconds;
+
+            // Se il countdown è finito
+            if (distance < 0) {
+                clearInterval(countdownFunction);
+                document.getElementById("countdown").innerHTML = "È arrivato il tuo premio!";
+            }
+        }, 1000);
+    </script>
+
+</body>
+</html>
