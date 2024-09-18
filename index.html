@@ -29,16 +29,20 @@
 <body>
 
     <div class="container">
-        <h1>Tra 3 ore avrai il tuo premio!</h1>
-        <img src="gatto.webp" alt="Gatto con cuore">
-        <div id="countdown">03:00:00</div>
+        <h1>Rosa, avrai il tuo premio quando finirai i compiti e di studiare!</h1>
+        <img src="https://raw.githubusercontent.com/succodicarota/succodicarota.github.io/refs/heads/main/gatto.webp" alt="Gatto con cuore">
+        <div id="countdown">Caricamento...</div>
     </div>
 
     <script>
-        // Imposta il tempo di fine (3 ore in millisecondi)
-        var countDownDate = new Date().getTime() + 3 * 60 * 60 * 1000;
+        var countDownDate = localStorage.getItem('countDownDate');
+        if (!countDownDate) {
+            countDownDate = new Date().getTime() + 3 * 60 * 60 * 1000;
+            localStorage.setItem('countDownDate', countDownDate);
+        } else {
+            countDownDate = parseInt(countDownDate);
+        }
 
-        // Aggiorna il conto alla rovescia ogni secondo
         var countdownFunction = setInterval(function() {
             var now = new Date().getTime();
             var distance = countDownDate - now;
@@ -47,12 +51,16 @@
             var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
+            hours = (hours < 10 ? '0' : '') + hours;
+            minutes = (minutes < 10 ? '0' : '') + minutes;
+            seconds = (seconds < 10 ? '0' : '') + seconds;
+
             document.getElementById("countdown").innerHTML = hours + ":" + minutes + ":" + seconds;
 
-            // Se il countdown è finito
             if (distance < 0) {
                 clearInterval(countdownFunction);
                 document.getElementById("countdown").innerHTML = "È arrivato il tuo premio!";
+                localStorage.removeItem('countDownDate');
             }
         }, 1000);
     </script>
