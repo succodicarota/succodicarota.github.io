@@ -3,74 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Countdown con Immagine</title>
+    <title>Perché Dovresti Comprare un Pacchetto Pokémon, Elena!</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
             text-align: center;
-            background-color: #f0f0f0;
         }
         h1 {
-            color: #333;
+            color: #ff4500;
         }
-        #countdown {
-            font-size: 2em;
-            color: #ff4444;
+        .content {
+            margin: 20px auto;
+            padding: 20px;
+            width: 80%;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        .container {
-            margin-top: 50px;
+        .reasons {
+            list-style-type: none;
+            padding: 0;
         }
-        img {
-            width: 200px;
+        .reasons li {
+            margin: 10px 0;
+        }
+        .pokemon-img {
+            width: 100px;
             height: auto;
+            margin: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #32cd32;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #228b22;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Rosa, avrai il tuo premio quando finirai i compiti e di studiare!</h1>
-        <img src="gatto.webp" alt="Gatto con cuore">
-        <div id="countdown">Caricamento...</div>
+    <h1>Ciao Elena!</h1>
+
+    <div class="content">
+        <img src="https://assets.pokemon.com/assets/cms2/img/pokedex/full/025.png" alt="Pikachu" class="pokemon-img">
+        <h2>3 Motivi per cui devi assolutamente comprare quel pacchetto Pokémon:</h2>
+        <ul class="reasons">
+            <li><strong>1. Carte rare:</strong> Potresti trovare quella carta rara che stavi cercando da tempo!</li>
+            <li><strong>2. Nuove sorprese:</strong> Ogni pacchetto è una sorpresa e sai quanto è divertente scoprire cosa c'è dentro!</li>
+            <li><strong>3. Aumenta la tua collezione:</strong> Il tuo mazzo Pokémon sarà ancora più potente e completo.</li>
+        </ul>
+
+        <img src="https://assets.pokemon.com/assets/cms2/img/cards/web/XY12/XY12_EN_EN_1.png" alt="Carta Pokémon" class="pokemon-img">
+        
+        <h2>Cosa stai aspettando?</h2>
+        <button onclick="window.location.href='https://www.pokemon.com/it/'">Compra il Pacchetto!</button>
     </div>
-
-    <script>
-        // Ottieni la data e ora di fine dal localStorage, se esiste
-        var countDownDate = localStorage.getItem('countDownDate');
-
-        // Se non esiste, impostane una nuova data di fine (3 ore dal momento attuale)
-        if (!countDownDate) {
-            countDownDate = new Date().getTime() + 3 * 60 * 60 * 1000;
-            localStorage.setItem('countDownDate', countDownDate);
-        } else {
-            countDownDate = parseInt(countDownDate);
-        }
-
-        // Aggiorna il conto alla rovescia ogni secondo
-        var countdownFunction = setInterval(function() {
-            var now = new Date().getTime();
-            var distance = countDownDate - now;
-
-            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            // Aggiungi uno zero iniziale se necessario
-            hours = (hours < 10 ? '0' : '') + hours;
-            minutes = (minutes < 10 ? '0' : '') + minutes;
-            seconds = (seconds < 10 ? '0' : '') + seconds;
-
-            document.getElementById("countdown").innerHTML = hours + ":" + minutes + ":" + seconds;
-
-            // Se il countdown è finito
-            if (distance < 0) {
-                clearInterval(countdownFunction);
-                document.getElementById("countdown").innerHTML = "È arrivato il tuo premio!";
-                // Rimuove la data dal localStorage
-                localStorage.removeItem('countDownDate');
-            }
-        }, 1000);
-    </script>
 
 </body>
 </html>
