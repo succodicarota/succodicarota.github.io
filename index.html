@@ -6,37 +6,43 @@
     <title>Auguri Claudia</title>
     <style>
         body {
-            background: linear-gradient(to right, #f8c3c5, #e5b2df); /* sfondo sfumato */
+            background: linear-gradient(to right, #f7a8b8, #a678d7); /* sfondo più delicato */
             color: #fff;
             text-align: center;
-            font-family: Arial, sans-serif;
+            font-family: 'Lobster', cursive; /* font elegante */
         }
         h1 {
-            font-size: 3em;
+            font-size: 4em;
             margin-top: 50px;
-            color: #24f0c7; /* colore del testo simile alla tua bozza */
+            color: #ffffff; /* bianco per contrasto */
+            text-shadow: 2px 2px #ff69b4; /* effetto ombra carino */
         }
         h2 {
-            font-size: 2em;
-            color: #24f0c7;
+            font-size: 3em;
+            color: #fff;
+            text-shadow: 1px 1px #ff69b4;
         }
         p {
-            font-size: 1.5em;
+            font-size: 1.8em;
             margin-top: 20px;
+            color: #ffffff;
         }
-        .sticker {
-            margin: 20px auto;
-            width: 200px;
-            height: 200px;
-            background: url('sticker.mp4') no-repeat center; /* formato GIF */
-            background-size: contain;
+        .video {
+            margin: 30px auto;
+            width: 320px;
+            height: 240px;
         }
     </style>
 </head>
 <body>
     <h1>Auguri Claudia</h1>
     <h2>+22</h2>
-    <div class="sticker"></div>
+    <div class="video">
+        <video width="320" height="240" controls>
+            <source src="sticker.mp4" type="video/mp4">
+            Il tuo browser non supporta il tag video.
+        </video>
+    </div>
     <p>Buon compleanno e goditi sto giorno, senza far caso a quanto sono deficiente.</p>
 </body>
 </html>
