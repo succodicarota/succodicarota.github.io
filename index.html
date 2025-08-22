@@ -1,48 +1,41 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Puzzle a frasi</title>
+<title>Puzzle Frasi</title>
 <style>
   body {
     font-family: sans-serif;
+    background: #111;
+    color: #fff;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
-    min-height: 100vh;
-    background: #111;
-    color: #fff;
     padding: 20px;
   }
   h2 { text-align: center; margin-bottom: 20px; }
-  #puzzle, #slots {
+  #slots, #words {
     display: flex;
     flex-wrap: wrap;
-    max-width: 360px;
-    margin-bottom: 20px;
     justify-content: center;
+    margin-bottom: 20px;
+    max-width: 360px;
   }
-  .word, .slot {
+  .slot, .word {
     background: #444;
     margin: 5px;
     padding: 8px 12px;
     border-radius: 5px;
+    text-align: center;
     cursor: pointer;
     user-select: none;
-    min-width: 40px;
-    text-align: center;
+    min-width: 50px;
     transition: background 0.3s;
   }
-  .slot {
-    background: #222;
-    min-height: 30px;
-    flex: 1;
-  }
-  .slot.correct { background: #2e7d32; } /* verde */
-  .slot.wrong { background: #b71c1c; }   /* rosso */
+  .slot { background: #222; min-height: 30px; flex: 1; }
+  .slot.correct { background: #2e7d32; color: #fff; }
+  .slot.wrong { background: #c62828; color: #fff; }
   #output {
     margin-top: 20px;
     white-space: pre-line;
@@ -54,13 +47,13 @@
 </head>
 <body>
 
-<h2>Ricomponi la frase!</h2>
+<h2>Ricomponi le frasi cliccando le parole!</h2>
 <div id="slots"></div>
-<div id="puzzle"></div>
+<div id="words"></div>
 <div id="output"></div>
 
 <script>
-const phrases = [
+const sentences = [
   "There's nothing like that the way you get me high",
   "You got a heart from heaven",
   "But you're burning like hell",
@@ -74,17 +67,17 @@ const phrases = [
 
 let currentIndex = 0;
 const slotsDiv = document.getElementById('slots');
-const puzzleDiv = document.getElementById('puzzle');
+const wordsDiv = document.getElementById('words');
 const outputDiv = document.getElementById('output');
 
-function loadPhrase(index) {
+function loadSentence(index) {
   slotsDiv.innerHTML = "";
-  puzzleDiv.innerHTML = "";
+  wordsDiv.innerHTML = "";
 
-  const words = phrases[index].split(" ");
+  const words = sentences[index].split(" ");
   const shuffled = [...words].sort(() => Math.random() - 0.5);
 
-  // crea slot
+  // crea slot vuoti
   words.forEach(() => {
     const slot = document.createElement("div");
     slot.className = "slot";
@@ -97,7 +90,7 @@ function loadPhrase(index) {
     div.className = "word";
     div.textContent = word;
     div.onclick = () => placeWord(div, words);
-    puzzleDiv.appendChild(div);
+    wordsDiv.appendChild(div);
   });
 }
 
@@ -106,45 +99,40 @@ function placeWord(wordDiv, correctWords) {
   if (!emptySlot) return;
 
   emptySlot.textContent = wordDiv.textContent;
-
-  // controllo correttezza
   const index = Array.from(slotsDiv.children).indexOf(emptySlot);
-  if (emptySlot.textContent === correctWords[index]) {
+
+  if (wordDiv.textContent === correctWords[index]) {
     emptySlot.classList.add("correct");
+    wordDiv.style.visibility = "hidden";
+    checkSentenceComplete(correctWords);
   } else {
     emptySlot.classList.add("wrong");
-  }
-
-  wordDiv.style.visibility = "hidden";
-
-  // se tutti riempiti
-  if (Array.from(slotsDiv.children).every(s => s.textContent)) {
-    checkCompletion(correctWords);
+    setTimeout(() => {
+      emptySlot.textContent = "";
+      emptySlot.classList.remove("wrong");
+      wordDiv.style.visibility = "visible";
+    }, 800);
   }
 }
 
-function checkCompletion(correctWords) {
+function checkSentenceComplete(correctWords) {
   const slotWords = Array.from(slotsDiv.children).map(s => s.textContent);
   if (slotWords.join(" ") === correctWords.join(" ")) {
     setTimeout(() => {
       currentIndex++;
-      if (currentIndex < phrases.length) {
-        loadPhrase(currentIndex);
+      if (currentIndex < sentences.length) {
+        loadSentence(currentIndex);
       } else {
-        outputDiv.textContent = phrases.join("\n");
+        outputDiv.textContent = sentences.join("\n");
         outputDiv.style.opacity = 1;
       }
-    }, 1000);
-  } else {
-    // errore -> reset
-    setTimeout(() => loadPhrase(currentIndex), 1000);
+    }, 500);
   }
 }
 
-// carica prima frase
-loadPhrase(currentIndex);
+// avvia la prima frase
+loadSentence(currentIndex);
 </script>
 
 </body>
 </html>
-
