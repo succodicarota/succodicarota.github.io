@@ -7,14 +7,19 @@
 <style>
   body {
     font-family: sans-serif;
-    background: #111;
+    background: url('https://images.unsplash.com/photo-1444703686981-a3abbc4d4fe3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5MTMyMXwwfDF8c2VhcmNofDF8fG1vb258ZW58MHx8fHwxNjk4MTk3NzM3&ixlib=rb-4.0.3&q=80&w=1080') no-repeat center center fixed;
+    background-size: cover;
     color: #fff;
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 20px;
   }
-  h2 { text-align: center; margin-bottom: 20px; }
+  h2 { 
+    text-align: center; 
+    margin-bottom: 20px; 
+    text-shadow: 2px 2px 6px #000;
+  }
   #slots, #words {
     display: flex;
     flex-wrap: wrap;
@@ -23,7 +28,7 @@
     max-width: 360px;
   }
   .slot, .word {
-    background: #444;
+    background: rgba(0,0,0,0.6);
     margin: 5px;
     padding: 8px 12px;
     border-radius: 5px;
@@ -31,17 +36,33 @@
     cursor: pointer;
     user-select: none;
     min-width: 50px;
-    transition: background 0.3s;
+    transition: all 0.3s;
   }
-  .slot { background: #222; min-height: 30px; flex: 1; }
-  .slot.correct { background: #2e7d32; color: #fff; }
-  .slot.wrong { background: #c62828; color: #fff; }
+  .slot { min-height: 30px; flex: 1; }
+  .slot.correct { 
+    background: #2e7d32; 
+    color: #fff; 
+    box-shadow: 0 0 15px #76ff03, 0 0 30px #76ff03 inset; 
+  }
+  .slot.wrong { 
+    background: #c62828; 
+    color: #fff; 
+    animation: shake 0.3s; 
+  }
+  @keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    50% { transform: translateX(3px); }
+    75% { transform: translateX(-3px); }
+    100% { transform: translateX(0); }
+  }
   #output {
     margin-top: 20px;
     white-space: pre-line;
     text-align: center;
     opacity: 0;
     transition: opacity 0.5s;
+    text-shadow: 1px 1px 4px #000;
   }
 </style>
 </head>
