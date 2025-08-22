@@ -1,48 +1,103 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auguri Giuseppe Platano Frio</title>
-    <style>
-        body {
-            background-color: #ffffff; /* sfondo bianco */
-            color: #000; /* colore del testo nero */
-            text-align: center;
-            font-family: 'Lobster', cursive; /* font elegante */
-            background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOSgjO5qSYB5wnEx55o30ViQThCvqYjQWtUg&s'); /* Sostituisci con un URL valido */
-            background-size: cover;
-            background-repeat: repeat;
-        }
-        h1 {
-            font-size: 4em;
-            margin-top: 50px;
-            color: #0000ff; /* blu */
-            text-shadow: 2px 2px #0000ff; /* effetto ombra */
-        }
-        h2 {
-            font-size: 3em;
-            color: #0000ff;
-            text-shadow: 1px 1px #0000ff;
-        }
-        p {
-            font-size: 1.8em;
-            margin-top: 20px;
-            color: #0000ff;
-        }
-        .immagine {
-            margin: 30px auto;
-            width: 320px;
-            height: 240px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Puzzle Drag & Drop</title>
+<style>
+  body {
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    background: #111;
+    color: #fff;
+    padding: 20px;
+  }
+  h2 { text-align: center; margin-bottom: 20px; }
+  #puzzle, #slots {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 360px;
+    margin-bottom: 20px;
+  }
+  .word, .slot {
+    background: #444;
+    margin: 5px;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: grab;
+    user-select: none;
+    min-width: 40px;
+    text-align: center;
+  }
+  .slot { background: #222; cursor: default; min-height: 30px; flex: 1; }
+  #output { margin-top: 20px; white-space: pre-line; text-align: center; opacity: 0; transition: opacity 0.5s; }
+</style>
 </head>
 <body>
-    <h1>Auguri Peppe Platano Frio</h1>
-    <h2>+20</h2>
-    <div class="immagine">
-        <img src="immagine.jpg" alt="Immagine di Giancry" width="320" height="240">
-    </div>
-    
+
+<h2>Ricomponi le parole trascinandole!</h2>
+<div id="slots"></div>
+<div id="puzzle"></div>
+<div id="output"></div>
+
+<script>
+const text = `There's nothing like that the way you get me high
+You got a heart from heaven
+But you're burning like hell
+
+Hurry up, I took a chance on you, yeah
+Bless this, put my hands on you, yeah
+Letting me put my trust on you, yeah
+Spending my whole advance on you
+Yeah, when I'm down you know how to lift me up
+From the ground, through the clouds to the sun`;
+
+const words = text.split(/\s+/);
+const shuffled = [...words].sort(() => Math.random() - 0.5);
+
+const puzzleDiv = document.getElementById('puzzle');
+const slotsDiv = document.getElementById('slots');
+const outputDiv = document.getElementById('output');
+
+let draggedWord = null;
+
+// crea slot vuoti
+words.forEach(() => {
+  const slot = document.createElement('div');
+  slot.className = 'slot';
+  slot.ondragover = e => e.preventDefault();
+  slot.ondrop = e => {
+    if (draggedWord) {
+      slot.textContent = draggedWord.textContent;
+      draggedWord.style.display = 'none';
+      checkCompletion();
+    }
+  };
+  slotsDiv.appendChild(slot);
+});
+
+// crea parole trascinabili
+shuffled.forEach(word => {
+  const div = document.createElement('div');
+  div.className = 'word';
+  div.textContent = word;
+  div.draggable = true;
+  div.ondragstart = () => { draggedWord = div; };
+  puzzleDiv.appendChild(div);
+});
+
+function checkCompletion() {
+  const slotWords = Array.from(slotsDiv.children).map(s => s.textContent || '');
+  if (slotWords.join(' ') === words.join(' ')) {
+    outputDiv.textContent = text;
+    outputDiv.style.opacity = 1;
+  }
+}
+</script>
+
 </body>
 </html>
