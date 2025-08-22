@@ -1,61 +1,103 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Countdown con Immagine</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f0f0f0;
-        }
-        h1 {
-            color: #333;
-        }
-        #countdown {
-            font-size: 2em;
-            color: #ff4444;
-        }
-        .container {
-            margin-top: 50px;
-        }
-        img {
-            width: 200px;
-            height: auto;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Puzzle Drag & Drop</title>
+<style>
+  body {
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    background: #111;
+    color: #fff;
+    padding: 20px;
+  }
+  h2 { text-align: center; margin-bottom: 20px; }
+  #puzzle, #slots {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 360px;
+    margin-bottom: 20px;
+  }
+  .word, .slot {
+    background: #444;
+    margin: 5px;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: grab;
+    user-select: none;
+    min-width: 40px;
+    text-align: center;
+  }
+  .slot { background: #222; cursor: default; min-height: 30px; flex: 1; }
+  #output { margin-top: 20px; white-space: pre-line; text-align: center; opacity: 0; transition: opacity 0.5s; }
+</style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Tra 3 ore avrai il tuo premio!</h1>
-        <img src="gatto.webp" alt="Gatto con cuore">
-        <div id="countdown">03:00:00</div>
-    </div>
+<h2>Ricomponi le parole trascinandole!</h2>
+<div id="slots"></div>
+<div id="puzzle"></div>
+<div id="output"></div>
 
-    <script>
-        // Imposta il tempo di fine (3 ore in millisecondi)
-        var countDownDate = new Date().getTime() + 3 * 60 * 60 * 1000;
+<script>
+const text = `There's nothing like that the way you get me high
+You got a heart from heaven
+But you're burning like hell
 
-        // Aggiorna il conto alla rovescia ogni secondo
-        var countdownFunction = setInterval(function() {
-            var now = new Date().getTime();
-            var distance = countDownDate - now;
+Hurry up, I took a chance on you, yeah
+Bless this, put my hands on you, yeah
+Letting me put my trust on you, yeah
+Spending my whole advance on you
+Yeah, when I'm down you know how to lift me up
+From the ground, through the clouds to the sun`;
 
-            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+const words = text.split(/\s+/);
+const shuffled = [...words].sort(() => Math.random() - 0.5);
 
-            document.getElementById("countdown").innerHTML = hours + ":" + minutes + ":" + seconds;
+const puzzleDiv = document.getElementById('puzzle');
+const slotsDiv = document.getElementById('slots');
+const outputDiv = document.getElementById('output');
 
-            // Se il countdown è finito
-            if (distance < 0) {
-                clearInterval(countdownFunction);
-                document.getElementById("countdown").innerHTML = "È arrivato il tuo premio!";
-            }
-        }, 1000);
-    </script>
+let draggedWord = null;
+
+// crea slot vuoti
+words.forEach(() => {
+  const slot = document.createElement('div');
+  slot.className = 'slot';
+  slot.ondragover = e => e.preventDefault();
+  slot.ondrop = e => {
+    if (draggedWord) {
+      slot.textContent = draggedWord.textContent;
+      draggedWord.style.display = 'none';
+      checkCompletion();
+    }
+  };
+  slotsDiv.appendChild(slot);
+});
+
+// crea parole trascinabili
+shuffled.forEach(word => {
+  const div = document.createElement('div');
+  div.className = 'word';
+  div.textContent = word;
+  div.draggable = true;
+  div.ondragstart = () => { draggedWord = div; };
+  puzzleDiv.appendChild(div);
+});
+
+function checkCompletion() {
+  const slotWords = Array.from(slotsDiv.children).map(s => s.textContent || '');
+  if (slotWords.join(' ') === words.join(' ')) {
+    outputDiv.textContent = text;
+    outputDiv.style.opacity = 1;
+  }
+}
+</script>
 
 </body>
 </html>
