@@ -1,124 +1,124 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Puzzle Drag & Drop</title>
+<title>Puzzle Frase</title>
 <style>
   body {
     font-family: sans-serif;
+    background: #111;
+    color: #fff;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
-    min-height: 100vh;
-    background: #111;
-    color: #fff;
     padding: 20px;
   }
-  h2 { text-align: center; margin-bottom: 20px; }
-  #puzzle, #slots {
+  h2 { margin-bottom: 20px; text-align: center; }
+  #slots, #words {
     display: flex;
     flex-wrap: wrap;
-    max-width: 400px;
-    margin-bottom: 20px;
     justify-content: center;
+    margin: 10px 0;
+    max-width: 360px;
   }
-  .piece, .slot {
-    background: #444;
+  .slot, .word {
     margin: 5px;
     padding: 10px 14px;
-    border-radius: 8px;
-    cursor: grab;
-    user-select: none;
+    border-radius: 6px;
+    min-width: 50px;
     text-align: center;
-    min-width: 80px;
+    cursor: pointer;
+    font-size: 16px;
   }
-  .slot { 
-    background: #222; 
-    cursor: default; 
-    min-height: 40px; 
-    flex: 1; 
-    transition: background 0.3s;
+  .slot {
+    background: #222;
+    min-height: 30px;
+    flex: 1;
   }
-  .correct { background: #2e7d32 !important; color: #fff; }
-  .wrong { background: #c62828 !important; color: #fff; }
-  #output { 
-    margin-top: 20px; 
-    white-space: pre-line; 
-    text-align: center; 
-    opacity: 0; 
-    transition: opacity 0.6s; 
+  .word {
+    background: #444;
+  }
+  .correct {
+    background: #2e7d32 !important;
+    color: #fff;
+    cursor: default;
+  }
+  .wrong {
+    background: #c62828 !important;
+    color: #fff;
+  }
+  #output {
+    margin-top: 20px;
+    font-size: 18px;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.5s;
+    white-space: pre-line;
   }
 </style>
 </head>
 <body>
 
-<h2>Trascina i pezzi per ricomporre il testo!</h2>
+<h2>Ricomponi la frase!</h2>
 <div id="slots"></div>
-<div id="puzzle"></div>
+<div id="words"></div>
 <div id="output"></div>
 
 <script>
-const text = `There's nothing like the way you get me high
-You got a heart from heaven
-But you're burning like hell`;
+const text = "You lift me up when I'm down";
+const words = text.split(" ");
+const shuffled = [...words].sort(() => Math.random() - 0.5);
 
-const fragments = [
-  "There's nothing like the way you get me high",
-  "You got a heart from heaven",
-  "But you're burning like hell"
-];
+const slotsDiv = document.getElementById("slots");
+const wordsDiv = document.getElementById("words");
+const outputDiv = document.getElementById("output");
 
-// mischiamo i pezzi
-const shuffled = [...fragments].sort(() => Math.random() - 0.5);
-
-const puzzleDiv = document.getElementById('puzzle');
-const slotsDiv = document.getElementById('slots');
-const outputDiv = document.getElementById('output');
-
-let draggedPiece = null;
+let selectedWord = null;
 
 // crea slot vuoti
-fragments.forEach((_, index) => {
-  const slot = document.createElement('div');
-  slot.className = 'slot';
-  slot.dataset.index = index; // posizione corretta
-  slot.ondragover = e => e.preventDefault();
-  slot.ondrop = e => {
-    if (draggedPiece) {
-      slot.textContent = draggedPiece.textContent;
-
-      if (draggedPiece.textContent === fragments[index]) {
+words.forEach((_, i) => {
+  const slot = document.createElement("div");
+  slot.className = "slot";
+  slot.dataset.index = i;
+  slot.onclick = () => {
+    if (selectedWord) {
+      if (selectedWord.textContent === words[i]) {
+        slot.textContent = selectedWord.textContent;
         slot.classList.add("correct");
-        slot.classList.remove("wrong");
-        draggedPiece.style.display = 'none'; // pezzo usato
+        selectedWord.remove();
+        selectedWord = null;
+        checkCompletion();
       } else {
+        slot.textContent = selectedWord.textContent;
         slot.classList.add("wrong");
         setTimeout(() => {
-          slot.textContent = ""; 
+          slot.textContent = "";
           slot.classList.remove("wrong");
-        }, 800); // dopo 0.8s si resetta
+        }, 800);
+        selectedWord = null;
       }
-      checkCompletion();
     }
   };
   slotsDiv.appendChild(slot);
 });
 
-// crea pezzi trascinabili
-shuffled.forEach(piece => {
-  const div = document.createElement('div');
-  div.className = 'piece';
-  div.textContent = piece;
-  div.draggable = true;
-  div.ondragstart = () => { draggedPiece = div; };
-  puzzleDiv.appendChild(div);
+// crea parole cliccabili
+shuffled.forEach(word => {
+  const div = document.createElement("div");
+  div.className = "word";
+  div.textContent = word;
+  div.onclick = () => {
+    if (selectedWord) selectedWord.classList.remove("selected");
+    selectedWord = div;
+    div.classList.add("selected");
+  };
+  wordsDiv.appendChild(div);
 });
 
 function checkCompletion() {
-  const slotTexts = Array.from(slotsDiv.children).map(s => s.textContent || '');
-  if (slotTexts.join(' ') === fragments.join(' ')) {
+  const slotWords = Array.from(slotsDiv.children).map(s => s.textContent);
+  if (slotWords.join(" ") === words.join(" ")) {
     outputDiv.textContent = text;
     outputDiv.style.opacity = 1;
   }
