@@ -1,60 +1,54 @@
+
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Puzzle Frase</title>
+<title>Puzzle a frasi</title>
 <style>
   body {
     font-family: sans-serif;
-    background: #111;
-    color: #fff;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    background: #111;
+    color: #fff;
     padding: 20px;
   }
-  h2 { margin-bottom: 20px; text-align: center; }
-  #slots, #words {
+  h2 { text-align: center; margin-bottom: 20px; }
+  #puzzle, #slots {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    margin: 10px 0;
     max-width: 360px;
+    margin-bottom: 20px;
+    justify-content: center;
   }
-  .slot, .word {
+  .word, .slot {
+    background: #444;
     margin: 5px;
-    padding: 10px 14px;
-    border-radius: 6px;
-    min-width: 50px;
-    text-align: center;
+    padding: 8px 12px;
+    border-radius: 5px;
     cursor: pointer;
-    font-size: 16px;
+    user-select: none;
+    min-width: 40px;
+    text-align: center;
+    transition: background 0.3s;
   }
   .slot {
     background: #222;
     min-height: 30px;
     flex: 1;
   }
-  .word {
-    background: #444;
-  }
-  .correct {
-    background: #2e7d32 !important;
-    color: #fff;
-    cursor: default;
-  }
-  .wrong {
-    background: #c62828 !important;
-    color: #fff;
-  }
+  .slot.correct { background: #2e7d32; } /* verde */
+  .slot.wrong { background: #b71c1c; }   /* rosso */
   #output {
     margin-top: 20px;
-    font-size: 18px;
+    white-space: pre-line;
     text-align: center;
     opacity: 0;
     transition: opacity 0.5s;
-    white-space: pre-line;
   }
 </style>
 </head>
@@ -62,68 +56,95 @@
 
 <h2>Ricomponi la frase!</h2>
 <div id="slots"></div>
-<div id="words"></div>
+<div id="puzzle"></div>
 <div id="output"></div>
 
 <script>
-const text = "You lift me up when I'm down";
-const words = text.split(" ");
-const shuffled = [...words].sort(() => Math.random() - 0.5);
+const phrases = [
+  "There's nothing like that the way you get me high",
+  "You got a heart from heaven",
+  "But you're burning like hell",
+  "Hurry up, I took a chance on you, yeah",
+  "Bless this, put my hands on you, yeah",
+  "Letting me put my trust on you, yeah",
+  "Spending my whole advance on you",
+  "Yeah, when I'm down you know how to lift me up",
+  "From the ground, through the clouds to the sun"
+];
 
-const slotsDiv = document.getElementById("slots");
-const wordsDiv = document.getElementById("words");
-const outputDiv = document.getElementById("output");
+let currentIndex = 0;
+const slotsDiv = document.getElementById('slots');
+const puzzleDiv = document.getElementById('puzzle');
+const outputDiv = document.getElementById('output');
 
-let selectedWord = null;
+function loadPhrase(index) {
+  slotsDiv.innerHTML = "";
+  puzzleDiv.innerHTML = "";
 
-// crea slot vuoti
-words.forEach((_, i) => {
-  const slot = document.createElement("div");
-  slot.className = "slot";
-  slot.dataset.index = i;
-  slot.onclick = () => {
-    if (selectedWord) {
-      if (selectedWord.textContent === words[i]) {
-        slot.textContent = selectedWord.textContent;
-        slot.classList.add("correct");
-        selectedWord.remove();
-        selectedWord = null;
-        checkCompletion();
-      } else {
-        slot.textContent = selectedWord.textContent;
-        slot.classList.add("wrong");
-        setTimeout(() => {
-          slot.textContent = "";
-          slot.classList.remove("wrong");
-        }, 800);
-        selectedWord = null;
-      }
-    }
-  };
-  slotsDiv.appendChild(slot);
-});
+  const words = phrases[index].split(" ");
+  const shuffled = [...words].sort(() => Math.random() - 0.5);
 
-// crea parole cliccabili
-shuffled.forEach(word => {
-  const div = document.createElement("div");
-  div.className = "word";
-  div.textContent = word;
-  div.onclick = () => {
-    if (selectedWord) selectedWord.classList.remove("selected");
-    selectedWord = div;
-    div.classList.add("selected");
-  };
-  wordsDiv.appendChild(div);
-});
+  // crea slot
+  words.forEach(() => {
+    const slot = document.createElement("div");
+    slot.className = "slot";
+    slotsDiv.appendChild(slot);
+  });
 
-function checkCompletion() {
-  const slotWords = Array.from(slotsDiv.children).map(s => s.textContent);
-  if (slotWords.join(" ") === words.join(" ")) {
-    outputDiv.textContent = text;
-    outputDiv.style.opacity = 1;
+  // crea parole cliccabili
+  shuffled.forEach(word => {
+    const div = document.createElement("div");
+    div.className = "word";
+    div.textContent = word;
+    div.onclick = () => placeWord(div, words);
+    puzzleDiv.appendChild(div);
+  });
+}
+
+function placeWord(wordDiv, correctWords) {
+  const emptySlot = Array.from(slotsDiv.children).find(s => !s.textContent);
+  if (!emptySlot) return;
+
+  emptySlot.textContent = wordDiv.textContent;
+
+  // controllo correttezza
+  const index = Array.from(slotsDiv.children).indexOf(emptySlot);
+  if (emptySlot.textContent === correctWords[index]) {
+    emptySlot.classList.add("correct");
+  } else {
+    emptySlot.classList.add("wrong");
+  }
+
+  wordDiv.style.visibility = "hidden";
+
+  // se tutti riempiti
+  if (Array.from(slotsDiv.children).every(s => s.textContent)) {
+    checkCompletion(correctWords);
   }
 }
+
+function checkCompletion(correctWords) {
+  const slotWords = Array.from(slotsDiv.children).map(s => s.textContent);
+  if (slotWords.join(" ") === correctWords.join(" ")) {
+    setTimeout(() => {
+      currentIndex++;
+      if (currentIndex < phrases.length) {
+        loadPhrase(currentIndex);
+      } else {
+        outputDiv.textContent = phrases.join("\n");
+        outputDiv.style.opacity = 1;
+      }
+    }, 1000);
+  } else {
+    // errore -> reset
+    setTimeout(() => loadPhrase(currentIndex), 1000);
+  }
+}
+
+// carica prima frase
+loadPhrase(currentIndex);
 </script>
 
 </body>
 </html>
+
