@@ -20,79 +20,105 @@
   #puzzle, #slots {
     display: flex;
     flex-wrap: wrap;
-    max-width: 360px;
+    max-width: 400px;
     margin-bottom: 20px;
+    justify-content: center;
   }
-  .word, .slot {
+  .piece, .slot {
     background: #444;
     margin: 5px;
-    padding: 8px 12px;
-    border-radius: 5px;
+    padding: 10px 14px;
+    border-radius: 8px;
     cursor: grab;
     user-select: none;
-    min-width: 40px;
     text-align: center;
+    min-width: 80px;
   }
-  .slot { background: #222; cursor: default; min-height: 30px; flex: 1; }
-  #output { margin-top: 20px; white-space: pre-line; text-align: center; opacity: 0; transition: opacity 0.5s; }
+  .slot { 
+    background: #222; 
+    cursor: default; 
+    min-height: 40px; 
+    flex: 1; 
+    transition: background 0.3s;
+  }
+  .correct { background: #2e7d32 !important; color: #fff; }
+  .wrong { background: #c62828 !important; color: #fff; }
+  #output { 
+    margin-top: 20px; 
+    white-space: pre-line; 
+    text-align: center; 
+    opacity: 0; 
+    transition: opacity 0.6s; 
+  }
 </style>
 </head>
 <body>
 
-<h2>Ricomponi le parole trascinandole!</h2>
+<h2>Trascina i pezzi per ricomporre il testo!</h2>
 <div id="slots"></div>
 <div id="puzzle"></div>
 <div id="output"></div>
 
 <script>
-const text = `There's nothing like that the way you get me high
+const text = `There's nothing like the way you get me high
 You got a heart from heaven
-But you're burning like hell
+But you're burning like hell`;
 
-Hurry up, I took a chance on you, yeah
-Bless this, put my hands on you, yeah
-Letting me put my trust on you, yeah
-Spending my whole advance on you
-Yeah, when I'm down you know how to lift me up
-From the ground, through the clouds to the sun`;
+const fragments = [
+  "There's nothing like the way you get me high",
+  "You got a heart from heaven",
+  "But you're burning like hell"
+];
 
-const words = text.split(/\s+/);
-const shuffled = [...words].sort(() => Math.random() - 0.5);
+// mischiamo i pezzi
+const shuffled = [...fragments].sort(() => Math.random() - 0.5);
 
 const puzzleDiv = document.getElementById('puzzle');
 const slotsDiv = document.getElementById('slots');
 const outputDiv = document.getElementById('output');
 
-let draggedWord = null;
+let draggedPiece = null;
 
 // crea slot vuoti
-words.forEach(() => {
+fragments.forEach((_, index) => {
   const slot = document.createElement('div');
   slot.className = 'slot';
+  slot.dataset.index = index; // posizione corretta
   slot.ondragover = e => e.preventDefault();
   slot.ondrop = e => {
-    if (draggedWord) {
-      slot.textContent = draggedWord.textContent;
-      draggedWord.style.display = 'none';
+    if (draggedPiece) {
+      slot.textContent = draggedPiece.textContent;
+
+      if (draggedPiece.textContent === fragments[index]) {
+        slot.classList.add("correct");
+        slot.classList.remove("wrong");
+        draggedPiece.style.display = 'none'; // pezzo usato
+      } else {
+        slot.classList.add("wrong");
+        setTimeout(() => {
+          slot.textContent = ""; 
+          slot.classList.remove("wrong");
+        }, 800); // dopo 0.8s si resetta
+      }
       checkCompletion();
     }
   };
   slotsDiv.appendChild(slot);
 });
 
-// crea parole trascinabili
-shuffled.forEach(word => {
+// crea pezzi trascinabili
+shuffled.forEach(piece => {
   const div = document.createElement('div');
-  div.className = 'word';
-  div.textContent = word;
+  div.className = 'piece';
+  div.textContent = piece;
   div.draggable = true;
-  div.ondragstart = () => { draggedWord = div; };
+  div.ondragstart = () => { draggedPiece = div; };
   puzzleDiv.appendChild(div);
 });
 
 function checkCompletion() {
-  const slotWords = Array.from(slotsDiv.children).map(s => s.textContent || '');
-  if (slotWords.join(' ') === words.join(' ')) {
+  const slotTexts = Array.from(slotsDiv.children).map(s => s.textContent || '');
+  if (slotTexts.join(' ') === fragments.join(' ')) {
     outputDiv.textContent = text;
     outputDiv.style.opacity = 1;
   }
